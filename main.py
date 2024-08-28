@@ -164,6 +164,14 @@ async def record_landmark(user_data:RecordLandmark):
 
         final_record = list(val.values())[idx-1]
 
+        try:
+            ref2 = db.reference('selectionset').child(user_data.user_id)
+            ref2.push(final_record[-1])
+
+        except Exception as e:
+            return f"error, {e}"
+
+        return final_record[-1]
 
     except Exception as e:
         return f"error, {e}"
