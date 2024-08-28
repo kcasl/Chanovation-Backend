@@ -4,4 +4,4 @@ Frontend : Flutter - https://github.com/hiseyong/visit_my_hometown
 
 Backend : fastAPI - https://github.com/kcasl/Chanovation-Backend
 
-AWS - Backend Hosting - Chanovation.store/docs#/
+AWS - Backend Hosting - http://Chanovation.store/docs#/
