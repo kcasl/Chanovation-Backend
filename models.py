@@ -38,56 +38,52 @@ class GetAddress(BaseModel):
 
 class PushLandmark(BaseModel):
     user_id:str
-    token:str
-    landmark:str
-    durationtime:float
+    x_crd:str
+    y_crd:str
+    times:int
 
     class Config:
         schema_extra ={
             "example":{
                 "user_id": "YEyabE8L2obLqTuobUVWlSNY8Dr1",
-                "token":"Xkw19vgwf1k41kqgt91igjk1nddxbxjcb1ufijwl1u5uwu1op5ui1y49w",
-                "landmark":"경복궁",
-                "durationtime":123 # 분 단위로 기록할 것
+                "latitude":"37.56",
+                "longitude":"127.32",
+                "times":1 # 항상 1로 보낼것
             }
         }
 
-# class GetLandmark(BaseModel):
-#     token:str
-#     landmark:str
-#
-#     class Config:
-#         schema_extra ={
-#             "example":{
-#                 "email":"sample@gmail.com",
-#                 "password":"samplepass123"
-#             }
-#         }
+class GetLandmark(BaseModel):
+    user_id:str
+
+    class Config:
+        schema_extra ={
+            "example":{
+                "user_id": "YEyabE8L2obLqTuobUVWlSNY8Dr1"
+            }
+        }
 
 class RecordLandmark(BaseModel):
     user_id:str
-    token:str
-    landmark:str
+    idx:int
 
     class Config:
         schema_extra = {
             "example": {
                 "user_id":"YEyabE8L2obLqTuobUVWlSNY8Dr1",
-                "token": "Xkw19vgwf1k41kqgt91igjk1nddxbxjcb1ufijwl1u5uwu1op5ui1y49w",
-                "landmark": "경복궁"
+                "idx": 1
             }
         }
 
 class QueryLandmark(BaseModel):
-    user_id: str
-    token:str
-    landmark:str
+    query:str
+    x_crd:str
+    y_crd:str
 
     class Config:
         schema_extra ={
             "example":{
-                "user_id": "YEyabE8L2obLqTuobUVWlSNY8Dr1",
-                "email":"sample@gmail.com",
-                "password":"samplepass123"
+                "query":"경복궁",
+                "latitude":"37.56",
+                "longitude":"127.32"
             }
         }

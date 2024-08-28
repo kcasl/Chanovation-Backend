@@ -93,28 +93,36 @@ async def get_address(user_data:GetAddress):
 
 # 주변 지역의 랜드마크를 db에 기록
 @app.post('/pushlm')
-async def push_landmark(user_data: PushLandmark):
+async def push_landmark(user_data:PushLandmark):
     try:
+        x = float(user_data.x_crd)
+        y = float(user_data.y_crd)
+        address = get_users_address(x, y)
+
         ref = db.reference('landmark')
 
         data = {
-            "landmark": user_data.landmark,
-            "durationtime": user_data.durationtime
+            "location": address,
+            "times": user_data.times
         }
 
         try:
-            ref_val = db.reference('landmark').child(user_data.user_id).child('landmarks')
+            ref_val = db.reference('landmark').child(user_data.user_id)
             val = ref_val.get()
 
-            if (list(val.values())[-1]["landmark"] != user_data.landmark):
-                ref_val.push(data)
-                return JSONResponse(content={"message" : "pushed successfuly"})
-            else:
-                ref_val.child(list(val.keys())[-1]).update(data)
+            if (list(val.values())[-1]["location"] == address):
+                newdata = {
+                    "location": address,
+                    "times": list(val.values())[-1]["times"] + 1
+                }
+                ref_val.child(list(val.keys())[-1]).update(newdata)
                 return JSONResponse(content={"message": "updated successfuly"})
+            else:
+                ref_val.push(data)
+                return JSONResponse(content={"message": "pushed successfuly"})
 
         except Exception as e:
-            ref.child(user_data.user_id).child('landmarks').push(data)
+            ref.child(user_data.user_id).push(data)
             return JSONResponse(content={"message": "created successfuly"})
 
     except Exception as e:
@@ -122,19 +130,54 @@ async def push_landmark(user_data: PushLandmark):
 
 # 체류 시간 기반 랜드마크 후보군 선정
 @app.post('/getlm')
-async def get_landmark(request:Request):
-    pass
+async def get_landmark(user_data:GetLandmark):
+    try:
+        ref = db.reference('landmark').child(user_data.user_id)
+        val = ref.get()
+
+        location_times = [(item.get("times", -float('inf')), item.get("location", None)) for item in val.values()]
+        location_times.sort(key=lambda x: x[0], reverse=True)
+        locations = {
+            idx + 1: location for idx, (times, location) in enumerate(location_times[:3])
+        }
+
+        try:
+            ref2 = db.reference('userselection').child(user_data.user_id)
+            ref2.push(locations)
+
+        except Exception as e:
+            return f"error, {e}"
+
+        return locations
+
+    except Exception as e:
+        return f"error, {e}"
 
 # 최종 여행지 기록
 @app.post('/recordlm')
 async def record_landmark(user_data:RecordLandmark):
-    pass
+    try:
+        idx = user_data.idx
 
-# 여행지 검색
+        ref = db.reference('userselection').child(user_data.user_id)
+        val = ref.get()
+
+        final_record = list(val.values())[idx-1]
+
+
+    except Exception as e:
+        return f"error, {e}"
+
+# 주변 여행지 검색
 @app.post('/querylm')
 async def query_landmark(user_data:QueryLandmark):
-    pass
+    x = float(user_data.x_crd)
+    y = float(user_data.y_crd)
+    q = user_data.query
 
+    #print(search_places(q, x, y))
+
+    return search_places(q, x, y)
 
 
 if __name__ == "__main__":
